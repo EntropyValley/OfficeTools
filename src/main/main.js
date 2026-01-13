@@ -1,4 +1,4 @@
-import { app, BrowserWindow, WebContentsView } from 'electron';
+import { app, BrowserWindow, WebContentsView, ipcMain } from 'electron';
 import Storage from './modules/storage';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
@@ -28,6 +28,7 @@ const setupWindows = () => {
     frame: false,
     webPreferences: {
       partition: "persist:office-tools",
+      preload: path.join(__dirname, '../renderer/ui_preload.js')
     },
   });
 
@@ -44,7 +45,7 @@ const setupWindows = () => {
   // Create Subview
   const subView = new WebContentsView({
     webPreferences: {
-      preload: path.join(__dirname, 'preload_page.js'),
+      preload: path.join(__dirname, '../renderer/page_preload.js'),
       partition: "persist:office-tools"
     }
   });
