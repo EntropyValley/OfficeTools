@@ -1,5 +1,5 @@
-import { app, BrowserWindow, WebContentsView, ipcMain } from 'electron';
-import Storage from './storage'
+import { app, BrowserWindow, WebContentsView } from 'electron';
+import Storage from './modules/storage';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 
@@ -27,19 +27,27 @@ const setupWindows = () => {
     fullscreenable: false,
     frame: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      partition: "persist:office-tools"
+      partition: "persist:office-tools",
     },
   });
 
-  // Load controls UI
-  mainWindow.loadFile(path.join(__dirname, `../../index.html`));
+  // and load the index.html of the app.
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+  }
 
   // Get Main Bounds
   const mainWindowBounds = mainWindow.getBounds();
 
   // Create Subview
-  const subView = new WebContentsView();
+  const subView = new WebContentsView({
+    webPreferences: {
+      preload: path.join(__dirname, 'preload_page.js'),
+      partition: "persist:office-tools"
+    }
+  });
   mainWindow.contentView.addChildView(subView)
   subView.setBounds({x: 210, y: 50, width: mainWindowBounds.width - 220, height: mainWindowBounds.height - 60});
 
@@ -47,7 +55,7 @@ const setupWindows = () => {
   const handleSubViewBounds = () => {
     const newBounds = mainWindow.getBounds();
     const isMaximized = mainWindow.isMaximized();
-    const extraPadding = isMaximized ? 8 : 0;
+    const extraPadding = isMaximized && process.platform != 'darwin' ? 8 : 0;
     subView.setBounds({x: 210 , y: 50, width: newBounds.width - 220 - 2*extraPadding, height: newBounds.height - 60 - 2*extraPadding})
     Storage.set("lastWindowState", newBounds);
   }
