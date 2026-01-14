@@ -25,10 +25,16 @@ const setupWindows = () => {
     x: lastWindowState.x,
     y: lastWindowState.y,
     fullscreenable: false,
-    frame: false,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#002E5D',
+      symbolColor: '#D6D6D6',
+      height: 40
+    },
+    trafficLightPosition: { x: 12, y: 12 },
     webPreferences: {
       partition: "persist:office-tools",
-      preload: path.join(__dirname, '../renderer/ui_preload.js')
+      preload: path.join(__dirname, 'ui_preload.js')
     },
   });
 
@@ -45,7 +51,7 @@ const setupWindows = () => {
   // Create Subview
   const subView = new WebContentsView({
     webPreferences: {
-      preload: path.join(__dirname, '../renderer/page_preload.js'),
+      preload: path.join(__dirname, '../page/page_preload.js'),
       partition: "persist:office-tools"
     }
   });
@@ -61,13 +67,19 @@ const setupWindows = () => {
     Storage.set("lastWindowState", newBounds);
   }
 
-  mainWindow.on("resized", handleSubViewBounds);
   mainWindow.on("maximize", handleSubViewBounds);
   mainWindow.on("unmaximize", handleSubViewBounds);
 
+  mainWindow.on("will-resize", (event, newBounds) => {
+    const isMaximized = mainWindow.isMaximized();
+    const extraPadding = isMaximized && process.platform != 'darwin' ? 8 : 0;
+    subView.setBounds({x: 210 , y: 50, width: newBounds.width - 220 - 2*extraPadding, height: newBounds.height - 60 - 2*extraPadding})
+    Storage.set("lastWindowState", newBounds);
+  });
+
   mainWindow.on("move", () => {
     Storage.set("lastWindowState", mainWindow.getBounds());
-  })
+  });
 
   subView.webContents.loadURL('https://google.com');
 
@@ -93,6 +105,11 @@ app.whenReady().then(() => {
   // Handle IPC messages
   ipcMain.handle('page_option_request', async (event) => {
 
+  });
+  ipcMain.handle('system_metadata_request', async (event) => {
+    return {
+      platform: process.platform
+    }
   });
   ipcMain.on('current_page_back', (event) => {
 

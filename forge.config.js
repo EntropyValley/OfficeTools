@@ -38,12 +38,12 @@ module.exports = {
             target: 'main',
           },
           {
-            entry: 'src/renderer/ui_preload.js',
+            entry: 'src/ui/ui_preload.js',
             config: 'vite.ui_preload.config.mjs',
             target: 'preload',
           },
           {
-            entry: 'src/renderer/page_preload.js',
+            entry: 'src/page/page_preload.js',
             config: 'vite.page_preload.config.mjs',
             target: 'preload',
           }
