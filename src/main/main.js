@@ -89,6 +89,41 @@ app.whenReady().then(() => {
       setupWindows();
     }
   });
+
+  // Handle IPC messages
+  ipcMain.handle('page_option_request', async (event) => {
+
+  });
+  ipcMain.on('current_page_back', (event) => {
+
+  });
+  ipcMain.on('current_page_forward', (event) => {
+
+  });
+  ipcMain.on('window_close', (event) => {
+
+  });
+  ipcMain.on('window_toggle_maximize', (event) => {
+
+  });
+  ipcMain.on('window_minimize', (event) => {
+
+  });
+  ipcMain.on('page_option_activate', (event, id) => {
+
+  });
+  ipcMain.on('page_option_reorder', (event, movingID, beforeID) => {
+
+  });
+  ipcMain.on('page_option_new_request', (event) => {
+
+  });
+  ipcMain.on('page_option_edit_request', (event, id) => {
+
+  });
+  ipcMain.on('settings_request', (event) => {
+
+  });
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
